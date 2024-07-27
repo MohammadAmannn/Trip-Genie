@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import AutoSuggestComponent from "../create-trip/Autocomplete"; // Ensure the correct path
+import AutoSuggestComponent from "../create-trip/Autocomplete";
 import { Input } from "@/components/ui/input";
 import { AI_PROMPT, SelectBudgetOption, SelectTravelList } from "@/constent/options";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { chatSession } from "@/service/AImodel";
-import { doc, documentId, setDoc } from "firebase/firestore";
-import { db } from "@/service/firebaseConfig"; // Make sure to import the Firestore database
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/service/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
 function CreateTrip() {
@@ -17,8 +17,8 @@ function CreateTrip() {
     Members: ""
   });
 
-  const [Loading, setLoading] = useState(false);
-  const navigate=useNavigate()
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
     setFormData({ ...formField, [name]: value });
@@ -28,7 +28,7 @@ function CreateTrip() {
     console.log(formField);
   }, [formField]);
 
-  const OnGenerateTrip = async () => {
+  const onGenerateTrip = async () => {
     const { Destination, NoOfDays, Budget, Members } = formField;
 
     if (!Destination || !NoOfDays || !Budget || !Members) {
@@ -36,49 +36,43 @@ function CreateTrip() {
       return;
     }
 
-    // if (Number(NoOfDays) <= 5) {
-    //   toast("Number of days should be greater than 5.");
-    //   return;
-    // }
-
     setLoading(true);
-    const final_prompt = AI_PROMPT.replace('{location}', formField?.Destination)
-      .replace('{totaldays}', formField?.NoOfDays)
-      .replace('{traveler}', formField?.Members)
-      .replace('{budget}', formField?.Budget)
-      .replace('{totaldays}', formField?.NoOfDays);
+    const finalPrompt = AI_PROMPT.replace('{location}', Destination)
+      .replace('{totaldays}', NoOfDays)
+      .replace('{traveler}', Members)
+      .replace('{budget}', Budget)
+      .replace('{totaldays}', NoOfDays);
 
-    toast("Creating Your Trip Please Wait");
-    console.log('Prompt:', final_prompt); // Log the final prompt for debugging
+    toast("Creating Your Trip, Please Wait...");
+    console.log('Prompt:', finalPrompt);
 
     try {
-      const result = await chatSession.sendMessage(final_prompt);
+      const result = await chatSession.sendMessage(finalPrompt);
       console.log('AI Response:', result?.response?.text());
-      SaveAiTrip(result?.response?.text());
+      saveAiTrip(result?.response?.text());
     } catch (error) {
-      console.error('Error generating trip:', error); // Log the specific error
+      console.error('Error generating trip:', error);
       toast.error("Failed to generate trip. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const SaveAiTrip = async (TripData) => {
+  const saveAiTrip = async (tripData) => {
     setLoading(true);
     try {
       const docId = Date.now().toString();
 
-      await setDoc(doc(db, "AITrips",docId), {
+      await setDoc(doc(db, "AITrips", docId), {
         userChoice: formField,
-        tripData: JSON.parse(TripData),
-        id:docId
+        tripData: JSON.parse(tripData),
+        id: docId
       });
 
-
       toast.success("Trip created successfully!");
-      navigate('/view-trip/'+docId)
+      navigate(`/view-trip/${docId}`);
     } catch (error) {
-      console.error('Error saving trip:', error); // Log the specific error
+      console.error('Error saving trip:', error);
       toast.error("Failed to save trip. Please try again.");
     } finally {
       setLoading(false);
@@ -86,66 +80,61 @@ function CreateTrip() {
   };
 
   return (
-    <div className="sm:px-10 md:px-32 lg:px-56 xl:px-72 px-5 mt-10">
-      <h2 className="font-bold text-3xl">Tell Us Your Travel Preference 🏕️</h2>
-      <p className="mt-3 text-xl text-gray-500">
-        Our AI Trip Planner revolutionizes the way you plan your travels.
-      </p>
-      <div className="mt-10 flex flex-col ">
-        <div>
-          <h2 className="text-xl flex font-medium">
-            What Is Your Destination Of Choice?
-          </h2>
-          <AutoSuggestComponent onChange={(value) => handleInputChange("Destination", value)} />
-        </div>
-        <div>
-          <h2 className="text-xl flex my-6 font-medium">
-            How Many Days Are You Planning Your Trip?
-          </h2>
-          <Input 
-            placeholder="Ex. 3" 
-            type="number" 
-            onChange={(e) => handleInputChange("NoOfDays", e.target.value)} 
-          />
-        </div>
-      </div>
-      <div>
-        <h2 className="text-xl my-6 flex font-medium">What Is Your Budget?</h2>
-        <div className="grid grid-cols-3 gap-5 mt-5 ">
-          {SelectBudgetOption.map((item, index) => (
-            <div 
-              key={index}
-              onClick={() => handleInputChange('Budget', item.title)} 
-              className={`p-4 border rounded-lg cursor-pointer 
-                ${formField?.Budget === item.title ? 'shadow-lg border-blue-500' : 'hover:shadow-lg'}
-              `}>
-              <span className="text-4xl">{item.icon}</span>
-              <span className="text-lg">{item.title}</span>
+    <div className="p-6 md:p-10 lg:p-16 xl:p-20 mx-auto max-w-4xl bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-lg shadow-lg relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 via-pink-500 to-purple-600 opacity-30"></div>
+      <div className="relative z-10">
+        <h2 className="text-3xl font-bold mb-4 text-white text-center">Tell Us Your Travel Preferences 🏕️</h2>
+        <p className="text-lg text-gray-200 mb-8 text-center">
+          Our AI Trip Planner revolutionizes the way you plan your travels.
+        </p>
+        <div className="space-y-6">
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-white">What Is Your Destination Of Choice?</h3>
+            <AutoSuggestComponent onChange={(value) => handleInputChange("Destination", value)} />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-white">How Many Days Are You Planning Your Trip?</h3>
+            <Input 
+              placeholder="Ex. 3" 
+              type="number" 
+              onChange={(e) => handleInputChange("NoOfDays", e.target.value)} 
+            />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-white">What Is Your Budget?</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {SelectBudgetOption.map((item, index) => (
+                <div 
+                  key={index}
+                  onClick={() => handleInputChange('Budget', item.title)} 
+                  className={`p-4 border rounded-lg cursor-pointer transition-transform transform ${formField?.Budget === item.title ? 'bg-blue-300 border-blue-500 shadow-lg scale-105' : 'hover:bg-blue-200'}`}>
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="text-lg font-medium ml-2">{item.title}</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h2 className="text-xl flex my-6 font-medium">Select Members</h2>
-        <div className="grid grid-cols-3 gap-5 mt-5 ">
-          {SelectTravelList.map((item, index) => (
-            <div 
-              key={index} 
-              onClick={() => handleInputChange('Members', item.title)} 
-              className={`p-4 border rounded-lg cursor-pointer 
-                ${formField?.Members === item.title ? 'shadow-lg border-blue-500' : 'hover:shadow-lg'}
-              `}>
-              <span className="text-4xl">{item.icon}</span>
-              <span className="ml-2">{item.title}</span>
-              <span className="ml-2">{item.description}</span>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2 text-white">Select Members</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {SelectTravelList.map((item, index) => (
+                <div 
+                  key={index}
+                  onClick={() => handleInputChange('Members', item.title)} 
+                  className={`p-4 border rounded-lg cursor-pointer transition-transform transform ${formField?.Members === item.title ? 'bg-blue-300 border-blue-500 shadow-lg scale-105' : 'hover:bg-blue-200'}`}>
+                  <span className="text-3xl">{item.icon}</span>
+                  <span className="ml-2 font-medium">{item.title}</span>
+                  <span className="text-gray-300 ml-2">{item.description}</span>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-      <div className="my-10 justify-end flex">
-        <Button onClick={OnGenerateTrip} disabled={Loading}>
-          {Loading ? "Generating..." : "Generate Trip"}
-        </Button>
+        <div className="mt-8 text-center">
+          <Button onClick={onGenerateTrip} disabled={loading} className="w-full md:w-auto">
+            {loading ? "Generating..." : "Generate Trip"}
+          </Button>
+        </div>
       </div>
     </div>
   );

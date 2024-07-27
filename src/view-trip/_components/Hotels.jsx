@@ -20,10 +20,10 @@ function Hotels({ trip }) {
               />
               <div className="my-2 flex flex-col gap-2">
                 <h2 className="font-medium">{hotel.name}</h2>
-                <h2 className="text-xs text-gray-500">📍{hotel.address}</h2>
+                <h2 className="text-s text-gray-500">📍{hotel.address}</h2>
                 <h2 className="text-xs text-black-500">💰{hotel.price}</h2>
                 <h2 className="text-md text-gray-500">⭐{hotel.rating}</h2>
-                <h2 className="text-md text-blue-500">📰{hotel.description}</h2>
+                {/* <h2 className="text-md text-blue-500">📰{hotel.description}</h2> */}
                 {/* Add other hotel details here if needed */}
               </div>
             </div>

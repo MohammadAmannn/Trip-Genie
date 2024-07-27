@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 
+body{
 
+  @apply bg-gradient-to-r from-purple-100 via-pink-200 to-blue-100;
+
+}
 @layer base {
   :root {
     --background: 0 0% 100%;
