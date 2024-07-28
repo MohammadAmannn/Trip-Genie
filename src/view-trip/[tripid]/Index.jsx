@@ -41,7 +41,7 @@ function Viewtrip() {
       {/* Render the Hotels component with the trip data*/}
       <Hotels trip={trip} />
       {/* daily paln */}
-      <PlacesToVisit trip={trip}/>
+      <PlacesToVisit trip={trip} />
     </div>
   );
 }
