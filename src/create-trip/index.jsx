@@ -37,7 +37,7 @@ function CreateTrip() {
     }
 
     setLoading(true);
-    const finalPrompt = AI_PROMPT.replace('{location}', Destination)
+    const finalPrompt = AI_PROMPT.replace('{location}',Destination)
       .replace('{totaldays}', NoOfDays)
       .replace('{traveler}', Members)
       .replace('{budget}', Budget)
@@ -66,7 +66,8 @@ function CreateTrip() {
       await setDoc(doc(db, "AITrips", docId), {
         userChoice: formField,
         tripData: JSON.parse(tripData),
-        id: docId
+        id: docId,
+
       });
 
       toast.success("Trip created successfully!");
